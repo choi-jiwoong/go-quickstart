@@ -1,0 +1,14 @@
+# Git
+.git
+.gitignore
+
+# 빌드 결과물
+bin/
+coverage.out
+
+# 테스트 파일
+*_test.go
+
+# 기타 파일
+README.md
+Makefile
