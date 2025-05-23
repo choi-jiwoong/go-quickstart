@@ -77,37 +77,68 @@
 
 ## API 엔드포인트
 
+### 기본 API
 - `GET /`: 클라이언트 IP 정보 반환
 - `GET /ping`: 상태 확인 엔드포인트 (pong 응답)
+
+### 인증 API
+- `POST /login`: 사용자 로그인
+
+### 사용자 관리 API (인증 필요)
+- `GET /user/:id`: 특정 ID의 사용자 정보 조회 (관리자: 모든 사용자, 일반 사용자: 본인만)
+- `PUT /user/:id`: 사용자 정보 업데이트 (관리자: 모든 사용자, 일반 사용자: 본인만)
+
+### 관리자 전용 API (관리자 권한 필요)
 - `GET /users`: 모든 사용자 목록 조회
-- `GET /user/:id`: 특정 ID의 사용자 정보 조회
 - `POST /user`: 새 사용자 생성
-- `PUT /user/:id`: 사용자 정보 업데이트
 - `DELETE /user/:id`: 사용자 삭제
 
-### API 요청 예시
+## 권한 관리
 
-#### 사용자 생성 (POST /user)
+애플리케이션은 두 가지 사용자 역할을 지원합니다:
+
+1. **ADMIN**: 모든 API에 접근 가능
+2. **USER**: 본인의 정보만 조회 및 수정 가능
+
+## API 요청 예시
+
+### 로그인 (POST /login)
 ```json
+{
+  "username": "admin",
+  "password": "password123"
+}
+```
+
+응답:
+```json
+{
+  "id": 1,
+  "username": "admin",
+  "email": "admin@example.com",
+  "role": "ADMIN",
+  "token": "admin-token"
+}
+```
+
+### 인증이 필요한 API 호출
+```
+GET /user/1
+Authorization: Bearer admin-token
+```
+
+### 사용자 생성 (POST /user) - 관리자 전용
+```
+POST /user
+Authorization: Bearer admin-token
+Content-Type: application/json
+
 {
   "username": "newuser",
   "email": "newuser@example.com",
   "password": "password123",
   "role": "USER"
 }
-```
-
-#### 사용자 업데이트 (PUT /user/:id)
-```json
-{
-  "email": "updated@example.com",
-  "role": "ADMIN"
-}
-```
-
-#### 사용자 삭제 (DELETE /user/:id)
-```
-DELETE /user/1
 ```
 
 ## 환경 변수

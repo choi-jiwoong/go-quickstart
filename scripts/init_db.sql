@@ -14,6 +14,18 @@ CREATE TABLE IF NOT EXISTS users (
     CONSTRAINT UK_username UNIQUE (username)
 );
 
+-- 로그인 히스토리 테이블 생성
+CREATE TABLE IF NOT EXISTS login_history (
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    ip_address VARCHAR(50)  NULL,
+    login_time DATETIME(6)  NOT NULL,
+    success    BIT          NOT NULL,
+    user_agent VARCHAR(255) NULL,
+    user_id    BIGINT       NOT NULL,
+    CONSTRAINT FK_login_history_user FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
 -- 샘플 데이터 삽입
 INSERT INTO users (email, password, role, username)
 VALUES 

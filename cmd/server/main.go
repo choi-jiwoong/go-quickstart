@@ -34,13 +34,34 @@ func main() {
 	// 기존 라우트 등록
 	router.GET("/", api.RootHandler)
 	router.GET("/ping", api.PingHandler)
-
-	// 사용자 API 라우트 등록
-	router.GET("/users", api.GetUsers)
-	router.GET("/user/:id", api.GetUser)
-	router.POST("/user", api.CreateUser)
-	router.PUT("/user/:id", api.UpdateUser)
-	router.DELETE("/user/:id", api.DeleteUser)
+	
+	// 인증 API 라우트 등록
+	router.POST("/login", api.Login)
+	
+	// 인증이 필요한 API 그룹
+	authGroup := router.Group("")
+	authGroup.Use(middleware.RequireAuth())
+	{
+		// 사용자 조회 API
+		authGroup.GET("/user/:id", api.GetUser)
+		
+		// 사용자 정보 업데이트 API
+		authGroup.PUT("/user/:id", api.UpdateUser)
+		
+		// 관리자 전용 API 그룹
+		adminGroup := authGroup.Group("")
+		adminGroup.Use(middleware.RequireAdmin())
+		{
+			// 모든 사용자 목록 조회
+			adminGroup.GET("/users", api.GetUsers)
+			
+			// 사용자 생성
+			adminGroup.POST("/user", api.CreateUser)
+			
+			// 사용자 삭제
+			adminGroup.DELETE("/user/:id", api.DeleteUser)
+		}
+	}
 
 	// 서버 시작
 	serverAddr := fmt.Sprintf(":%s", cfg.Port)
